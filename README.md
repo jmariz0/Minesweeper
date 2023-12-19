@@ -1,2 +1,2 @@
-# Minesweeper-2.0
+# Minesweeper
 Minesweeper but in Python
