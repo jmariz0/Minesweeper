@@ -2,14 +2,16 @@
 # ⎯, □, ⚑
 
 import os, random
-
+num_of_mines = 0
+counter = 0
 game_over = 0
 lst = []
+possible_mines = []
 all_blank_cells = []
 current_blank_cells = []
 all_num_cells = []
 
-class Cell:
+class Cell:  
   def __init__(self, x, y):
     self.is_num = False
     self.is_mine = False
@@ -20,67 +22,73 @@ class Cell:
     self.x = x
     self.y = y
 
-def make_grid(len = 8, wid = 8):
-  for i in range(wid):
+def make_grid():
+  global lst
+  global possible_mines
+  
+  for i in range(wid_lst):
     sublst = []
-    for j in range(len):
-      sublst.append(Cell(j, i))
+    for j in range(len_lst):
+      cell = Cell(j, i)
+      sublst.append(cell)
+      possible_mines.append(cell)
     lst.append(sublst)
   return lst
 
 def make_mines():
-  x = 0
-  y = 0
-
-  for i in range(round(len_lst * wid_lst * 0.2)):
-    x = random.randint(0, len_lst - 1)
-    y = random.randint(0, wid_lst - 1)
-    lst[y][x].is_mine = True
-    lst[y][x].comp_val = 'B'
-
+  global num_of_mines
+  global possible_mines
+  num_of_mines = round(len_lst * wid_lst * mine_ratio)
+  
+  for i in range(num_of_mines):
+    z = random.randint(0, len(possible_mines) - 1)
+    possible_mines[z].is_mine = True
+    possible_mines[z].comp_val = 'M'
+    possible_mines.remove(possible_mines[z])
+  
 def make_num_cells():
   for i in range(len(lst)):
     for j in range(len(lst[i])):
-      if lst[i][j].comp_val != 'B':
+      if lst[i][j].comp_val != 'M':
         count = 0
         if i != 0 and j != 0:
           # Top Left
-          if lst[i-1][j-1].comp_val == 'B':
+          if lst[i-1][j-1].comp_val == 'M':
             count += 1
 
         if i != 0:
           # Top Center
-          if lst[i-1][j].comp_val == 'B':
+          if lst[i-1][j].comp_val == 'M':
             count += 1
 
         if i != 0 and j != len_lst - 1:
           # Top Right
-          if lst[i-1][j+1].comp_val == 'B':
+          if lst[i-1][j+1].comp_val == 'M':
             count += 1
 
         if j != 0:
           # Center Left
-          if lst[i][j-1].comp_val == 'B':
+          if lst[i][j-1].comp_val == 'M':
             count += 1
 
         if j != len_lst - 1:
           # Center Right
-          if lst[i][j+1].comp_val == 'B':
+          if lst[i][j+1].comp_val == 'M':
             count += 1
 
         if i != wid_lst - 1 and j != 0:
           # Bottom Left
-          if lst[i+1][j-1].comp_val == 'B':
+          if lst[i+1][j-1].comp_val == 'M':
             count += 1
 
         if i != wid_lst - 1:
           # Bottom Center
-          if lst[i+1][j].comp_val == 'B':
+          if lst[i+1][j].comp_val == 'M':
             count += 1
 
         if i != wid_lst - 1 and j != len_lst - 1:
           # Bottom Right
-          if lst[i+1][j+1].comp_val == 'B':
+          if lst[i+1][j+1].comp_val == 'M':
             count += 1
 
         if count == 0:
@@ -96,9 +104,9 @@ def display_grid(is_comp):
   
   for i in range(len(lst[0])):
     if i < 10:
-      str_2 += str(i) + '  '
+      str_2 += str(i + 1) + '  '
     else:
-      str_2 += str(i) + ' '
+      str_2 += str(i + 1) + ' '
 
     str_3 += '⎯⎯⎯'
 
@@ -106,10 +114,10 @@ def display_grid(is_comp):
   print(str_3)
   
   for i in range(len(lst)):
-    if i < 10:
-      grid_str += ' ' + str(i) + ' |'
+    if i < 9:
+      grid_str += ' ' + str(i + 1) + ' |'
     else:
-      grid_str += str(i) + ' |'
+      grid_str += str(i + 1) + ' |'
       
     for j in range(len(lst[i])):
       if is_comp:
@@ -120,11 +128,13 @@ def display_grid(is_comp):
   return grid_str
 
 def reveal_blank_cells(x, y):
+  global counter
   blank_cells = []
   if x != 0 and y != 0:
     # Top Left
     if not lst[y-1][x-1].is_vis:
       lst[y-1][x-1].is_vis = True
+      counter += 1
       lst[y-1][x-1].vis_val = lst[y-1][x-1].comp_val
       if lst[y-1][x-1].comp_val == '□':
         blank_cells.append(lst[y-1][x-1])
@@ -133,6 +143,7 @@ def reveal_blank_cells(x, y):
     # Top Center
     if not lst[y-1][x].is_vis:
       lst[y-1][x].is_vis = True
+      counter += 1
       lst[y-1][x].vis_val = lst[y-1][x].comp_val
       if lst[y-1][x].comp_val == '□':
         blank_cells.append(lst[y-1][x])
@@ -141,6 +152,7 @@ def reveal_blank_cells(x, y):
     # Top Right
     if not lst[y-1][x+1].is_vis:
       lst[y-1][x+1].is_vis = True
+      counter += 1
       lst[y-1][x+1].vis_val = lst[y-1][x+1].comp_val
       if lst[y-1][x+1].comp_val == '□':
         blank_cells.append(lst[y-1][x+1])
@@ -149,6 +161,7 @@ def reveal_blank_cells(x, y):
     # Center Left
     if not lst[y][x-1].is_vis:
       lst[y][x-1].is_vis = True
+      counter += 1
       lst[y][x-1].vis_val = lst[y][x-1].comp_val
       if lst[y][x-1].comp_val == '□':
         blank_cells.append(lst[y][x-1])
@@ -157,6 +170,7 @@ def reveal_blank_cells(x, y):
     # Center Right
     if not lst[y][x+1].is_vis:
       lst[y][x+1].is_vis = True
+      counter += 1
       lst[y][x+1].vis_val = lst[y][x+1].comp_val
       if lst[y][x+1].comp_val == '□':
         blank_cells.append(lst[y][x+1])
@@ -165,6 +179,7 @@ def reveal_blank_cells(x, y):
     # Bottom Left
     if not lst[y+1][x-1].is_vis:
       lst[y+1][x-1].is_vis = True
+      counter += 1
       lst[y+1][x-1].vis_val = lst[y+1][x-1].comp_val
       if lst[y+1][x-1].comp_val == '□':
         blank_cells.append(lst[y+1][x-1])
@@ -173,6 +188,7 @@ def reveal_blank_cells(x, y):
     # Bottom Center
     if not lst[y+1][x].is_vis:
       lst[y+1][x].is_vis = True
+      counter += 1
       lst[y+1][x].vis_val = lst[y+1][x].comp_val
       if lst[y+1][x].comp_val == '□':
         blank_cells.append(lst[y+1][x])
@@ -181,6 +197,7 @@ def reveal_blank_cells(x, y):
     # Bottom Right
     if not lst[y+1][x+1].is_vis:
       lst[y+1][x+1].is_vis = True
+      counter += 1
       lst[y+1][x+1].vis_val = lst[y+1][x+1].comp_val
       if lst[y+1][x+1].comp_val == '□':
         blank_cells.append(lst[y+1][x+1])
@@ -190,50 +207,99 @@ def reveal_blank_cells(x, y):
 
 def reveal_cell(x, y):
   global game_over
-  x = int(x)
-  y = int(y)
-
+  global counter
+  x = int(x) - 1
+  y = int(y) - 1
+  
   if not lst[y][x].is_vis:
     if lst[y][x].is_mine:
       game_over = 1
+      print('-------------------------\n')
+      print('You Lost')
+      print('\n-------------------------\n')
       print('Game over!')
     elif lst[y][x].is_num:
       lst[y][x].vis_val = lst[y][x].comp_val
+      lst[y][x].is_vis = True
+      counter += 1
     else:
       reveal_blank_cells(x, y)
-  else:
-    return 'You have already revealed this cell!'
 
-len_lst = int(input('What length should the grid have? '))
-wid_lst = int(input('What width should the grid have? '))
+print("\033[?25l", end = "")
+print('-------------------------\n\n')
+print('Minesweeper')
+print('\n\n-------------------------\n')
+print("\033[?25h", end = "")
+input('Press enter to start! ')
+print("\033[?25l", end = "")
+os.system('clear')
 
-make_grid(len_lst, wid_lst)
+print('-------------------------\n')
+print('Instructions')
+print('\n-------------------------\n')
+print('In Minesweeper, there is a grid (or minefield) containing cells, some of which are mines. Your goal is to reveal all the cells that are NOT mines without uncovering one.\n')
+print('There are five types of cells in this version:')
+print('- Unopened cells (?), which represent cells that have not been revealed.')
+print('- Numbered cells (1-8), which represent how many mines are in the 8 cells around them.')
+print('- Blank cells (□), which represent there are no mines left in the 8 cells around them.')
+print('- Flagged cells (⚑), which the player adds to represent a potential mine.')
+print('- Mines (M), which represent cells the player must not reveal in order to win the game.\n')
+print('To reveal (or flag) a cell, you will need a column and row number. Look at the top and left of the grid to find them, respectively.\n')
+print("\033[?25h", end = "")
+input('Press enter to customize your game! ')
+print("\033[?25l", end = "")
+os.system('clear')
+
+print('-------------------------\n')
+print('Settings')
+print('\n-------------------------\n')
+print("\033[?25h", end = "")
+len_lst = input('What length should your grid have? (Default is 10.) ')
+wid_lst = input('What width should your grid have? (Default is 10.) ')
+mine_ratio = input('What mine ratio should your grid have? (Default is 0.2.) ')
+print("\033[?25l", end = "")
+if len_lst == '':
+  len_lst = '10'
+len_lst = int(len_lst)
+if wid_lst == '':
+  wid_lst = '10'
+wid_lst = int(wid_lst)
+if mine_ratio == '':
+  mine_ratio = '0.2'
+mine_ratio = float(mine_ratio)
+os.system('clear')
+
+make_grid()
 make_mines()
 make_num_cells()
 
-while game_over == 0:  
+while game_over == 0 and counter != (len_lst * wid_lst) - num_of_mines:
+  os.system('clear')
+  print(display_grid(False))
+  print("\033[?25h", end = "")
+  reveal_cell_x = input('What is the column number of the cell you want to reveal? Input F to flag a cell. ')
+
+  if reveal_cell_x.upper() != 'F':
+    reveal_cell_y = input('\nWhat is the row number of the cell you want to reveal? Input F to flag a cell. ')
+  else:
+    reveal_cell_y = 'F'
+
+  if reveal_cell_x.upper() == 'F' or reveal_cell_y.upper() == 'F':
+    flag_cell_x = int(input('\nWhat is the column number of the cell you want to flag? '))
+    flag_cell_y = int(input('\nWhat is the row number of the cell you want to flag? '))
+    if lst[flag_cell_y][flag_cell_x].vis_val == '?':
+      lst[flag_cell_y][flag_cell_x].vis_val = '⚑'
+      lst[flag_cell_y][flag_cell_x].is_flagged = True
+    elif lst[flag_cell_y][flag_cell_x].vis_val == '⚑':
+      lst[flag_cell_y][flag_cell_x].vis_val = '?'
+      lst[flag_cell_y][flag_cell_x].is_flagged = False
+  else:
     os.system('clear')
-    print(display_grid(False))
+    reveal_cell(reveal_cell_x, reveal_cell_y)
 
-    reveal_cell_x = input('\nWhat is the column number of the cell you want to reveal? Input F to flag a cell. ')
-  
-    if reveal_cell_x.upper() != 'F':
-      reveal_cell_y = input('\nWhat is the row number of the cell you want to reveal? Input F to flag a cell. ')
-    else:
-      reveal_cell_y = 'F'
-
-    if reveal_cell_x.upper() == 'F' or reveal_cell_y.upper() == 'F':
-      flag_cell_x = int(input('\nWhat is the column number of the cell you want to flag? '))
-      flag_cell_y = int(input('\nWhat is the row number of the cell you want to flag? '))
-      
-      if lst[flag_cell_y][flag_cell_x].vis_val == '?':
-        lst[flag_cell_y][flag_cell_x].vis_val = '⚑'
-        lst[flag_cell_y][flag_cell_x].is_flagged = True
-      elif lst[flag_cell_y][flag_cell_x].vis_val == '⚑':
-        lst[flag_cell_y][flag_cell_x].vis_val = '?'
-        lst[flag_cell_y][flag_cell_x].is_flagged = False
-      else:
-        print('You have already revealed this cell!')
-    else:
-      os.system('clear')
-      reveal_cell(reveal_cell_x, reveal_cell_y)
+if counter == (len_lst * wid_lst) - num_of_mines:
+  os.system('clear')
+  print('-------------------------\n')
+  print('You Win!')
+  print('\n-------------------------\n')
+  print('Congrats, you have discovered all mines!')
