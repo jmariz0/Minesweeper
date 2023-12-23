@@ -285,8 +285,8 @@ while game_over == 0 and counter != (len_lst * wid_lst) - num_of_mines:
     reveal_cell_y = 'F'
 
   if reveal_cell_x.upper() == 'F' or reveal_cell_y.upper() == 'F':
-    flag_cell_x = int(input('\nWhat is the column number of the cell you want to flag? '))
-    flag_cell_y = int(input('\nWhat is the row number of the cell you want to flag? '))
+    flag_cell_x = int(input('\nWhat is the column number of the cell you want to flag? ')) - 1
+    flag_cell_y = int(input('\nWhat is the row number of the cell you want to flag? ')) - 1
     if lst[flag_cell_y][flag_cell_x].vis_val == '?':
       lst[flag_cell_y][flag_cell_x].vis_val = '⚑'
       lst[flag_cell_y][flag_cell_x].is_flagged = True
